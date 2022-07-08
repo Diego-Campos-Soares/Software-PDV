@@ -27,8 +27,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         dados_cliente = '\'' + str(nome) + '\'' + ',\'' + str(orcamento) + '\''  + ',\'' + str(bairro) + '\'' + ',\'' + str(cidade) + '\'' + ',\'' + str(endereco) + '\'' + ',\'' + str(estado) + '\'' + ',\'' + str(projeto) + '\'' ',\'' + str(telefone) + '\'' + ',\'' + str(celular) + '\'' + ');'
 
-        declaracao = f"""insert into table clientes
-                            (cliente, orçamento, bairro, cidade, endereço, UF, projeto, telefone, celular)
+        declaracao = f"""insert into clientes
+                            (cliente, orcamento, bairro, cidade, endereco, uf, projeto, telefone, celular)
                             values 
                             ({dados_cliente}"""  
     
@@ -37,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
 
         try:
-            con = mysql.connector.connect(host="localhost", database="clientes", user="root", password="")
+            con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
 
             if con.is_connected():
                 db_info = con.get_server_info()
@@ -68,11 +68,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print(self)
 
 
-var = MainWindow
-fun = var.valores_cliente
+#var = MainWindow
+#fun = var.valores_cliente
 #valor = fun.get_dados_cliente
 
-print(fun)
+#print(fun)
 
 
 
