@@ -3,13 +3,26 @@ import mysql.connector
 from mysql.connector import Error
 import sys
 
+con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
+cursor = con.cursor(buffered=True)
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent=parent)
         self.setupUi(self)
 
+       
+
         self.btn_avancar.clicked.connect(self.valores_cliente)
+        self.btn_salvar.clicked.connect(self.valores_produto)
+
+      
+    def fechar_conexao():
+        if con.is_connected():
+                cursor.close()
+                con.close()
+        print("Conexao ao MySql foi encerrada")
+
 
     def valores_cliente(self):
         cod = self.box_cliente.value()
@@ -36,48 +49,51 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         
 
-        try:
-            con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
+        
 
-            if con.is_connected():
-                db_info = con.get_server_info()
-                print("conectado ao servidor msql versao", db_info)
+        if con.is_connected():
+            db_info = con.get_server_info()
+            print("conectado ao servidor msql versao", db_info)
 
+       
             cursor = con.cursor(buffered=True)
-            cursor.execute("select database();")
             cursor.execute(declaracao)
             print(declaracao)
             con.commit()
             
-
-        except Error as erro:
-            print("falha ao inserir dados no MySQL: {}".format(erro))
-
-        finally:
-            if con.is_connected():
-                cursor.close()
-                con.close()
-                print("Conexao ao MySql foi encerrada")
+       
+        
 
     def valores_produto(self):
-        self.box_produto = self.box_produto.value()
-        self.quantidade = self.box_quantidade.value()
-        self.altura = self.box_altura.value()
-        self.largura = self.box_largura.value()
+        produto = self.box_produto.value()
+        quantidade = self.box_quantidade.value()
+        altura = self.box_altura.value()
+        largura = self.box_largura.value()
+        
+        valores = '\'' + str(produto) + '\'' + ',\'' + str(quantidade) + '\'' + ',\'' + str(altura) + '\'' + ',\'' + str(largura) + '\'' + ');'
 
-        print(self)
+        declaracao = f"""insert into orcamento
+                            (produto, quantidade, altura, largura)
+                            values 
+                            ({valores}"""  
+    
 
+        if con.is_connected:
+            db_info = con.get_server_info()
+            print("conectado ao servidor msql versao", db_info)
 
-#var = MainWindow
-#fun = var.valores_cliente
-#valor = fun.get_dados_cliente
-
-#print(fun)
-
+       
+            cursor = con.cursor(buffered=True)
+            cursor.execute(declaracao)
+            print(declaracao)
+            con.commit()
+    
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
     w.show()
+    
     sys.exit(app.exec_())
+    
