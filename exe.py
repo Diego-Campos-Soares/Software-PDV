@@ -1,4 +1,6 @@
 from gui import *
+from PyQt5 import *
+
 import mysql.connector
 from mysql.connector import Error
 import sys
@@ -14,10 +16,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
        
 
         self.btn_avancar.clicked.connect(self.valores_cliente)
-        self.btn_salvar.clicked.connect(self.valores_produto)
+        #self.btn_salvar.clicked.connect(self.valores_produto)
+
+        ############################   PAGINAS DO SISTEMA   ##############################
+
+        self.btn_PDV.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.PDV))
+        self.btn_produtos.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Produtos))
+        self.btn_caixa.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
+
+       # self.btn_PDV.clicked.connect(lambda: self.stackedWidget.setcurrentWidget(self.PDV))
+       # self.btn_PDV.clicked.connect(lambda: self.stackedWidget.setcurrentWidget(self.PDV))
+
 
       
-    def fechar_conexao():
+    def fechar_conexao(self):
         if con.is_connected():
                 cursor.close()
                 con.close()
