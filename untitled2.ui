@@ -77,7 +77,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="Cadastro">
            <attribute name="title">
@@ -124,8 +124,10 @@
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">
-</string>
+             <string notr="true"/>
+            </property>
+            <property name="editable">
+             <bool>false</bool>
             </property>
             <property name="currentIndex">
              <number>-1</number>
@@ -246,7 +248,7 @@
              <item>
               <widget class="QComboBox" name="combo_projeto">
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <item>
                 <property name="text">
@@ -512,22 +514,6 @@
              <set>Qt::AlignHCenter|Qt::AlignTop</set>
             </property>
            </widget>
-           <zorder>bairro</zorder>
-           <zorder>cidade</zorder>
-           <zorder>combo_modelo</zorder>
-           <zorder>btn_avancar</zorder>
-           <zorder>line_cliente</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget</zorder>
-           <zorder>imagem</zorder>
-           <zorder>label_7</zorder>
           </widget>
           <widget class="QWidget" name="selecao_de_itens">
            <attribute name="title">

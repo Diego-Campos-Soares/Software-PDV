@@ -1,12 +1,17 @@
+
 from gui import *
 import mysql.connector
-from setPixMap import index_modelo
-import list
+#from setPixMap import index_modelo
+#import list
+from PIL import Image
 import sys
 
 
 con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
 cursor = con.cursor(buffered=True)
+if con.is_connected():
+    db_info = con.get_server_info()
+    print("conectado ao servidor msql versao", db_info)
 
 # portas = [
 #     ("PROJETO SEM IMAGEM"),
@@ -47,18 +52,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_caixa.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
         self.btn_vendas.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Vendas))
         self.btn_cliente.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Clientes))
+        self.btn_cliente.clicked.connect(self.mostrar_clientes)
         self.btn_Usuario.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
 
         ###########################     COMBO_BOX       ####################################
         self.combo_projeto.currentIndexChanged.connect(self.endereco_combo)
         self.combo_modelo.currentIndexChanged.connect(self.index_modelo)
+
         self.endereco_combo()
+
+        # im = Image.open("resized/PORTA PIVOTANTE.png")
+        # im.show(MainWindow)
+
 
     def endereco_combo(self):
         projeto = self.combo_projeto.currentIndex()
 
         if projeto == 0:
             self.portas()
+
         if projeto == 1:
             self.janelas()
 
@@ -67,13 +79,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if modelo == 0:
             self.img_projeto.clear()
         elif modelo == 1:
-            self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE.PNG"))
+            self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE.png"))
         elif modelo == 2:
             self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE 1 FIXO.png"))
         elif modelo == 3:
             self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE 2 FOLHAS.png"))
         elif modelo == 4:
             self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE 2 FOLHAS 2 FIXOS.png"))
+
 
     def portas(self):
         self.combo_modelo.clear()
@@ -82,6 +95,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #dados_lidos = list.portas
         for p in dados_lidos:
             self.combo_modelo.addItems(p)
+
+
 
     def janelas(self):
         self.combo_modelo.clear()
@@ -105,37 +120,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         cidade = self.line_cidade.text()
         endereco = self.line_endereco.text()
         estado = self.line_estado.text()
-        projeto = self.box_projeto.value()
+        #projeto = self.combo_projeto.text()
         telefone = self.line_telefone.text()
         celular = self.line_celular.text()
 
 
 
-        dados_cliente = '\'' + str(nome) + '\'' + ',\'' + str(orcamento) + '\''  + ',\'' + str(bairro) + '\'' + ',\'' + str(cidade) + '\'' + ',\'' + str(endereco) + '\'' + ',\'' + str(estado) + '\'' + ',\'' + str(projeto) + '\'' ',\'' + str(telefone) + '\'' + ',\'' + str(celular) + '\'' + ');'
+        #dados_cliente = '\'' + str(nome) + '\'' + ',\'' + str(orcamento) + '\''  + ',\'' + str(bairro) + '\'' + ',\'' + str(cidade) + '\'' + ',\'' + str(endereco) + '\'' + ',\'' + str(estado) + '\'' + ',\'' + str(telefone) + '\'' + ',\'' + str(celular) + '\'' + ');'
 
         declaracao = f"""insert into clientes
-                            (cliente, orcamento, bairro, cidade, endereco, uf, projeto, telefone, celular)
-                            values 
-                            ({dados_cliente}"""  
-    
-
-
-        
-
-        
+                                 (cliente, orcamento, bairro, cidade, endereco, uf, telefone, celular)
+                                 values
+                                 ('{nome}', '{orcamento}', '{bairro}', '{cidade}', '{endereco}', '{estado}', '{telefone}', '{celular}')"""
 
         if con.is_connected():
-            db_info = con.get_server_info()
-            print("conectado ao servidor msql versao", db_info)
-
-       
             cursor = con.cursor(buffered=True)
             cursor.execute(declaracao)
             print(declaracao)
             con.commit()
             
        
-        
+    def mostrar_clientes(self):
+        cursor.execute("SELECT * FROM cliente")
+        dados_lidos = cursor.fetchall()
+        self.tabela_selecao_itens.setRowCount(len(dados_lidos))
+        con.commit()
+        print(dados_lidos)
 
     def valores_produto(self):
         produto = self.box_produto.value()
@@ -152,13 +162,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
 
         if con.is_connected:
-            db_info = con.get_server_info()
-            print("conectado ao servidor msql versao", db_info)
-
-       
             cursor = con.cursor(buffered=True)
             cursor.execute(declaracao)
-            cursor.execute("SELECT * FROM orcamento")
+            cursor.execute("SELECT * FROM cliente")
             dados_lidos = cursor.fetchall()
             self.tabela_selecao_itens.setRowCount(len(dados_lidos))
 
@@ -168,7 +174,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     
 
-        self.fechar_conexao()
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
