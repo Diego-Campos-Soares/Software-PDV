@@ -1,34 +1,34 @@
 from gui import *
-from PyQt5 import *
 import mysql.connector
-from mysql.connector import Error
+from setPixMap import index_modelo
+import list
 import sys
 
 
 con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
 cursor = con.cursor(buffered=True)
 
-portas = [
-    ("PROJETO SEM IMAGEM"),
-    ("PORTA PIVOTANTE"),
-    ("PORTA PIVOTANTE 1 FIXO"),
-    ("PORTA PIVOTANTE 2 FOLHAS"),
-    ("PORTA PIVOTANTE 2 FOLHAS 2 FIXO"),
-    ("PORTA PIVOTANTE 1 FIXO 1 BANDEIRA"),
-    ("PORTA PIVOTANTE"),
-    ("PORTA PIVOTANTE"),
-    ("PORTA PIVOTANTE"),
-    ("PORTA PIVOTANTE"),
-    ("PORTA PIVOTANTE"),
-    ("PORTA PIVOTANTE")
-
-]
-janelas = [
-    ("PROJETO SEM IMAGEM"),
-    ("JANELA 1 FOLHA MOVEL 1 FIXO"),
-    ("JANELA 2 FOLHAS MOVEL"),
-    ("JANELA 2 FOLHA MOVEL 1 FIXA")
-]
+# portas = [
+#     ("PROJETO SEM IMAGEM"),
+#     ("PORTA PIVOTANTE"),
+#     ("PORTA PIVOTANTE 1 FIXO"),
+#     ("PORTA PIVOTANTE 2 FOLHAS"),
+#     ("PORTA PIVOTANTE 2 FOLHAS 2 FIXO"),
+#     ("PORTA PIVOTANTE 1 FIXO 1 BANDEIRA"),
+#     ("PORTA PIVOTANTE"),
+#     ("PORTA PIVOTANTE"),
+#     ("PORTA PIVOTANTE"),
+#     ("PORTA PIVOTANTE"),
+#     ("PORTA PIVOTANTE"),
+#     ("PORTA PIVOTANTE")
+#
+# ]
+# janelas = [
+#     ("PROJETO SEM IMAGEM"),
+#     ("JANELA 1 FOLHA MOVEL 1 FIXO"),
+#     ("JANELA 2 FOLHAS MOVEL"),
+#     ("JANELA 2 FOLHA MOVEL 1 FIXA")
+# ]
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -50,24 +50,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_Usuario.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
 
         ###########################     COMBO_BOX       ####################################
-        self.combo_modelo.addItems(portas)
-        self.combo_projeto.currentIndexChanged.connect(self.index_projeto)
+        self.combo_projeto.currentIndexChanged.connect(self.endereco_combo)
         self.combo_modelo.currentIndexChanged.connect(self.index_modelo)
+        self.endereco_combo()
 
-        #PREENCHER COMBOBOX
-        #self.preencher()
-
-    def index_projeto(self):
-        projeto= self.combo_projeto.currentIndex()
+    def endereco_combo(self):
+        projeto = self.combo_projeto.currentIndex()
 
         if projeto == 0:
-            self.combo_modelo.clear()
-            self.combo_modelo.addItems(portas)
-        elif projeto == 1:
-            self.combo_modelo.clear()
-            self.combo_modelo.addItems(janelas)
-        print(projeto)
-
+            self.portas()
+        if projeto == 1:
+            self.janelas()
 
     def index_modelo(self):
         modelo = self.combo_modelo.currentIndex()
@@ -82,12 +75,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         elif modelo == 4:
             self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE 2 FOLHAS 2 FIXOS.png"))
 
-    """def preencher(self):
-        cursor.execute("SELECT Portas FROM projetos")
+    def portas(self):
+        self.combo_modelo.clear()
+        cursor.execute('SELECT Portas FROM portas')
         dados_lidos = cursor.fetchall()
-        for b in dados_lidos:
-            self.combo_modelo.addItems(b[0])"""
-            
+        #dados_lidos = list.portas
+        for p in dados_lidos:
+            self.combo_modelo.addItems(p)
+
+    def janelas(self):
+        self.combo_modelo.clear()
+        cursor.execute('SELECT Janelas FROM janelas')
+        dados_lidos = cursor.fetchall()
+        for j in dados_lidos:
+            self.combo_modelo.addItems(j)
+
     def fechar_conexao(self):
         if con.is_connected():
                 cursor.close()
@@ -166,7 +168,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     
 
-
+        self.fechar_conexao()
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
