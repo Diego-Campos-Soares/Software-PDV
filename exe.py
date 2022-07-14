@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox
 from GIT_PDV.gui import *
+from login import Ui_Login
 import mysql.connector
 import sys
 
@@ -9,6 +10,33 @@ cursor = con.cursor(buffered=True)
 if con.is_connected():
     db_info = con.get_server_info()
     print("conectado ao servidor msql versao", db_info)
+
+
+class Login(QWidget, Ui_Login):
+    def __init__(self) -> None:
+        super(Login, self).__init__()
+        self.setupUi(self)
+        self.setWindowTitle("Login")
+        self.btn_login.clicked.connect(self.open_system)
+
+    def open_system(self):
+        usuario = self.user.text()
+        senha = self.senha.text()
+        consult_user = f"""SELECT user From usuarios"""
+        consult_password = f"""SELECT senha From usuarios Where user ='{usuario}'"""
+        cursor.execute(consult_user)
+        user = cursor.fetchone()
+        cursor.execute(consult_password)
+        password = cursor.fetchone()
+
+        if usuario == user[0] and senha == password[0]:
+            self.w = MainWindow()
+            self.close()
+            self.w.show()
+        else:
+            QMessageBox.about(self,"Error","Usuario Nao Cadastrado")
+
+            #print("Usuario Nao Cadastrado")
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -23,6 +51,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_salvar_produto.clicked.connect(self.cadastro_produto)
         self.btn_atualizar_produto.clicked.connect(self.mostrar_produtos)
         self.btn_att_cliente.clicked.connect(self.mostrar_clientes)
+        self.btn_limpar_cliente.clicked.connect(self.apagar_clientes)
+        self.btn_limpar_produto.clicked.connect(self.apagar_produtos)
 
         ############################   PAGINAS DO SISTEMA   ##############################
 
@@ -103,9 +133,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                  ('{nome}', '{orcamento}', '{bairro}', '{cidade}', '{endereco}', '{estado}', '{telefone}', '{celular}')"""
 
 
+
+
         if con.is_connected():
             cursor = con.cursor(buffered=True)
             cursor.execute(inserir_clientes)
+
             print(inserir_clientes)
             con.commit()
 
@@ -118,6 +151,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for row, text in enumerate(dados_lidos):
             for column, data in enumerate(text):
                 self.tabela_cliente.setItem(row, column,QTableWidgetItem(str(data)))
+
+    def apagar_clientes(self):
+        apagar_clientes = f"""DROP TABLE clientes"""
+
+        criar_clientes = f"""CREATE TABLE IF NOT EXISTS`CLIENTES`(
+         `id` INT NOT NULL AUTO_INCREMENT, 
+         `cliente` VARCHAR(30),
+         `orcamento` INT(4) UNIQUE,
+         `bairro` VARCHAR(30),
+         `cidade` VARCHAR(30) DEFAULT 'SG',
+         `endereco` VARCHAR(50),
+         `uf` VARCHAR(2) DEFAULT 'RJ',
+         `projeto` INT,
+         `telefone` INT(11) UNIQUE,
+         `celular` INT(11) UNIQUE,
+         PRIMARY KEY(id)
+         )DEFAULT CHARSET = utf8mb4;"""
+        cursor.execute(apagar_clientes)
+        cursor.execute(criar_clientes)
+        print(criar_clientes)
+        con.commmit()
 
     def cadastro_orcamento(self):
         produto = self.box_produto.value()
@@ -136,10 +190,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         cod = self.box_codigo_produto.value()
         produto = self.line_produto.text()
         desc = self.line_descricao.text()
-        alt = self.box_altura_produto_2.value()
-        lar = self.box_largura_produto_2.value()
-        com = self.box_largura_produto_3.value()
-        val = self.box_valor_produto_2.value()
+        alt = self.box_altura_produto.value()
+        lar = self.box_largura_produto.value()
+        com = self.box_comprimento_produto.value()
+        val = self.box_valor_produto.value()
 
         inserir_produtos = f"""INSERT INTO produtos
                 (id, produto, descricao, altura, largura, valor, comprimento)
@@ -147,6 +201,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 ('{cod}','{produto}','{desc}','{alt}','{lar}','{val}','{com}')"""
 
         if con.is_connected():
+            cursor = con.cursor(buffered=True)
             cursor.execute(inserir_produtos)
             print(inserir_produtos)
             con.commit()
@@ -162,9 +217,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             for column, data in enumerate(text):
                 self.tabela_prodtuos.setItem(row, column, QTableWidgetItem(str(data)))
 
+    def apagar_produtos(self):
+        apagar_produto = f"""DROP TABLE produtos"""
+
+        criar_produto = f"""CREATE TABLE IF NOT EXISTS `jc_vidros`.`produtos` (
+                `id` INT(11) NOT NULL,
+                `produto` VARCHAR(45) NULL,
+                `descricao` VARCHAR(60) NULL,
+                `altura` DECIMAL(4,2) NULL,
+                `largura` DECIMAL(4,2) NULL,
+                `valor` DECIMAL(6,2) NULL,
+                `comprimento` DECIMAL(4,2) NULL,
+                PRIMARY KEY (`id`))
+                ENGINE = InnoDB
+                DEFAULT CHARACTER SET = utf8mb4;"""
+        cursor.execute(apagar_produto)
+        cursor.execute(criar_produto)
+        print(criar_produto)
+        con.commmit()
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = MainWindow()
-    w.show()
+    login = Login()
+    login.show()
     sys.exit(app.exec_())
 
