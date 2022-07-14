@@ -77,7 +77,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="Cadastro">
            <attribute name="title">
@@ -483,7 +483,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Imagem&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
-           <widget class="QLabel" name="label_7">
+           <widget class="QLabel" name="img_projeto">
             <property name="geometry">
              <rect>
               <x>510</x>
@@ -503,9 +503,6 @@
             </property>
             <property name="text">
              <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap>resized/PORTA PIVOTANTE 2 FOLHAS.png</pixmap>
             </property>
             <property name="scaledContents">
              <bool>false</bool>
@@ -1175,12 +1172,15 @@
       </widget>
       <widget class="QWidget" name="Produtos">
        <widget class="QTableWidget" name="tabela_prodtuos">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>60</x>
           <y>100</y>
-          <width>711</width>
-          <height>231</height>
+          <width>831</width>
+          <height>241</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -1188,6 +1188,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="showGrid">
          <bool>false</bool>
@@ -1218,6 +1221,11 @@
         <column>
          <property name="text">
           <string>Largura</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Comprimento</string>
          </property>
         </column>
         <column>
@@ -1280,6 +1288,17 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="btn_atualizar_produto">
+           <property name="text">
+            <string>Atualizar</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../../Desktop/icons/refresh.png</normaloff>../../../Desktop/icons/refresh.png</iconset>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QLabel" name="label_3">
@@ -1319,7 +1338,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="box_largura_produto_2">
+          <widget class="QDoubleSpinBox" name="box_largura_produto">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -1348,7 +1367,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="box_altura_produto_2">
+          <widget class="QDoubleSpinBox" name="box_altura_produto">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -1453,7 +1472,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_3">
+          <widget class="QLineEdit" name="line_descricao">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -1482,7 +1501,51 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="box_valor_produto_2">
+          <widget class="QDoubleSpinBox" name="box_valor_produto">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <double>999.990000000000009</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_9">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>470</y>
+          <width>181</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_36">
+         <item>
+          <widget class="QLabel" name="comprimento">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Comprimento&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="box_comprimento_produto">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -1668,7 +1731,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QTableWidget" name="tableWidget">
+        <widget class="QTableWidget" name="tabela_saida">
          <property name="geometry">
           <rect>
            <x>60</x>
@@ -1710,7 +1773,7 @@
           </property>
          </column>
         </widget>
-        <widget class="QTableWidget" name="tableWidget_2">
+        <widget class="QTableWidget" name="tabela_entrada">
          <property name="geometry">
           <rect>
            <x>50</x>
@@ -2071,10 +2134,10 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>90</y>
-          <width>801</width>
-          <height>241</height>
+          <x>20</x>
+          <y>80</y>
+          <width>981</width>
+          <height>281</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -2090,13 +2153,8 @@
          <bool>false</bool>
         </property>
         <property name="columnCount">
-         <number>8</number>
+         <number>11</number>
         </property>
-        <row>
-         <property name="text">
-          <string/>
-         </property>
-        </row>
         <column>
          <property name="text">
           <string>Codigo</string>
@@ -2109,7 +2167,7 @@
         </column>
         <column>
          <property name="text">
-          <string>Endereço</string>
+          <string>Orçamento</string>
          </property>
         </column>
         <column>
@@ -2120,6 +2178,21 @@
         <column>
          <property name="text">
           <string>Cidade</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Endereço</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Estado</string>
          </property>
         </column>
         <column>
@@ -2143,22 +2216,11 @@
          <rect>
           <x>230</x>
           <y>590</y>
-          <width>421</width>
-          <height>51</height>
+          <width>561</width>
+          <height>91</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_22">
-         <item>
-          <widget class="QPushButton" name="btn_salvar_cliente">
-           <property name="text">
-            <string>Salvar</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../Desktop/icons/save-icon-36513.png</normaloff>../../../Desktop/icons/save-icon-36513.png</iconset>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QPushButton" name="btn_alt_cliente">
            <property name="text">
@@ -2178,6 +2240,17 @@
            <property name="icon">
             <iconset>
              <normaloff>../../../Desktop/icons/broom.png</normaloff>../../../Desktop/icons/broom.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_att_cliente">
+           <property name="text">
+            <string>Atualizar</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../../Desktop/icons/refresh.png</normaloff>../../../Desktop/icons/refresh.png</iconset>
            </property>
           </widget>
          </item>

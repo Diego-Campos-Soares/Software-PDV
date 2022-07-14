@@ -1,9 +1,6 @@
-
-from gui import *
+from PyQt5.QtWidgets import QTableWidgetItem
+from GIT_PDV.gui import *
 import mysql.connector
-#from setPixMap import index_modelo
-#import list
-from PIL import Image
 import sys
 
 
@@ -13,27 +10,6 @@ if con.is_connected():
     db_info = con.get_server_info()
     print("conectado ao servidor msql versao", db_info)
 
-# portas = [
-#     ("PROJETO SEM IMAGEM"),
-#     ("PORTA PIVOTANTE"),
-#     ("PORTA PIVOTANTE 1 FIXO"),
-#     ("PORTA PIVOTANTE 2 FOLHAS"),
-#     ("PORTA PIVOTANTE 2 FOLHAS 2 FIXO"),
-#     ("PORTA PIVOTANTE 1 FIXO 1 BANDEIRA"),
-#     ("PORTA PIVOTANTE"),
-#     ("PORTA PIVOTANTE"),
-#     ("PORTA PIVOTANTE"),
-#     ("PORTA PIVOTANTE"),
-#     ("PORTA PIVOTANTE"),
-#     ("PORTA PIVOTANTE")
-#
-# ]
-# janelas = [
-#     ("PROJETO SEM IMAGEM"),
-#     ("JANELA 1 FOLHA MOVEL 1 FIXO"),
-#     ("JANELA 2 FOLHAS MOVEL"),
-#     ("JANELA 2 FOLHA MOVEL 1 FIXA")
-# ]
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -42,8 +18,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
        
         ########################    BOTOES DO SISTEMA   ##################################
-        self.btn_avancar.clicked.connect(self.valores_cliente)
-        self.btn_add.clicked.connect(self.valores_produto)
+        self.btn_novo_cadastro.clicked.connect(self.cadastro_cliente)
+        self.btn_salvar_selecao.clicked.connect(self.cadastro_orcamento)
+        self.btn_salvar_produto.clicked.connect(self.cadastro_produto)
+        self.btn_atualizar_produto.clicked.connect(self.mostrar_produtos)
+        self.btn_att_cliente.clicked.connect(self.mostrar_clientes)
 
         ############################   PAGINAS DO SISTEMA   ##############################
 
@@ -52,7 +31,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_caixa.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
         self.btn_vendas.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Vendas))
         self.btn_cliente.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Clientes))
-        self.btn_cliente.clicked.connect(self.mostrar_clientes)
         self.btn_Usuario.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
 
         ###########################     COMBO_BOX       ####################################
@@ -60,9 +38,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.combo_modelo.currentIndexChanged.connect(self.index_modelo)
 
         self.endereco_combo()
-
-        # im = Image.open("resized/PORTA PIVOTANTE.png")
-        # im.show(MainWindow)
+        self.mostrar_clientes()
+        self.mostrar_produtos()
 
 
     def endereco_combo(self):
@@ -87,7 +64,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         elif modelo == 4:
             self.img_projeto.setPixmap(QtGui.QPixmap("resized/PORTA PIVOTANTE 2 FOLHAS 2 FIXOS.png"))
 
-
     def portas(self):
         self.combo_modelo.clear()
         cursor.execute('SELECT Portas FROM portas')
@@ -95,8 +71,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #dados_lidos = list.portas
         for p in dados_lidos:
             self.combo_modelo.addItems(p)
-
-
 
     def janelas(self):
         self.combo_modelo.clear()
@@ -111,9 +85,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 con.close()
         print("Conexao ao MySql foi encerrada")
 
-
-    def valores_cliente(self):
-        cod = self.box_cliente.value()
+    def cadastro_cliente(self):
+        #cod = self.box_cliente.value()
         nome = self.line_cliente.text()
         orcamento = self.line_orcamento.text()
         bairro = self.line_bairro.text()
@@ -124,61 +97,74 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         telefone = self.line_telefone.text()
         celular = self.line_celular.text()
 
-
-
-        #dados_cliente = '\'' + str(nome) + '\'' + ',\'' + str(orcamento) + '\''  + ',\'' + str(bairro) + '\'' + ',\'' + str(cidade) + '\'' + ',\'' + str(endereco) + '\'' + ',\'' + str(estado) + '\'' + ',\'' + str(telefone) + '\'' + ',\'' + str(celular) + '\'' + ');'
-
-        declaracao = f"""insert into clientes
+        inserir_clientes = f"""insert into clientes
                                  (cliente, orcamento, bairro, cidade, endereco, uf, telefone, celular)
                                  values
                                  ('{nome}', '{orcamento}', '{bairro}', '{cidade}', '{endereco}', '{estado}', '{telefone}', '{celular}')"""
 
+
         if con.is_connected():
             cursor = con.cursor(buffered=True)
-            cursor.execute(declaracao)
-            print(declaracao)
+            cursor.execute(inserir_clientes)
+            print(inserir_clientes)
             con.commit()
-            
-       
-    def mostrar_clientes(self):
-        cursor.execute("SELECT * FROM cliente")
-        dados_lidos = cursor.fetchall()
-        self.tabela_selecao_itens.setRowCount(len(dados_lidos))
-        con.commit()
-        print(dados_lidos)
 
-    def valores_produto(self):
+    def mostrar_clientes(self):
+        cursor.execute("SELECT * FROM clientes")
+        dados_lidos = cursor.fetchall()
+        self.tabela_cliente.clearContents()
+        self.tabela_cliente.setRowCount(len(dados_lidos))
+
+        for row, text in enumerate(dados_lidos):
+            for column, data in enumerate(text):
+                self.tabela_cliente.setItem(row, column,QTableWidgetItem(str(data)))
+
+    def cadastro_orcamento(self):
         produto = self.box_produto.value()
         quantidade = self.box_quantidade.value()
         altura = self.box_altura.value()
         largura = self.box_largura.value()
-        
-        valores = '\'' + str(produto) + '\'' + ',\'' + str(quantidade) + '\'' + ',\'' + str(altura) + '\'' + ',\'' + str(largura) + '\'' + ');'
 
         declaracao = f"""insert into orcamento
                             (produto, quantidade, altura, largura)
                             values 
-                            ({valores}"""  
-    
+                            ('{produto}', '{quantidade}', ' {altura}', ' {largura})'"""
+        print(declaracao)
+        con.commit()
 
-        if con.is_connected:
-            cursor = con.cursor(buffered=True)
-            cursor.execute(declaracao)
-            cursor.execute("SELECT * FROM cliente")
-            dados_lidos = cursor.fetchall()
-            self.tabela_selecao_itens.setRowCount(len(dados_lidos))
+    def cadastro_produto(self):
+        cod = self.box_codigo_produto.value()
+        produto = self.line_produto.text()
+        desc = self.line_descricao.text()
+        alt = self.box_altura_produto_2.value()
+        lar = self.box_largura_produto_2.value()
+        com = self.box_largura_produto_3.value()
+        val = self.box_valor_produto_2.value()
 
-            print(declaracao)
+        inserir_produtos = f"""INSERT INTO produtos
+                (id, produto, descricao, altura, largura, valor, comprimento)
+                VALUES
+                ('{cod}','{produto}','{desc}','{alt}','{lar}','{val}','{com}')"""
+
+        if con.is_connected():
+            cursor.execute(inserir_produtos)
+            print(inserir_produtos)
             con.commit()
 
+    def mostrar_produtos(self):
+        cursor.execute("SELECT * FROM produtos")
+        dados_lidos = cursor.fetchall()
+        self.tabela_prodtuos.clearContents()
+        self.tabela_prodtuos.setRowCount(len(dados_lidos))
 
-    
 
+        for row, text in enumerate(dados_lidos):
+            for column, data in enumerate(text):
+                self.tabela_prodtuos.setItem(row, column, QTableWidgetItem(str(data)))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
     w.show()
-    
     sys.exit(app.exec_())
-    
+
