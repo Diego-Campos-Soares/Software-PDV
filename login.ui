@@ -61,7 +61,10 @@ color:white;</string>
 background:transparent;</string>
    </property>
    <property name="inputMethodHints">
-    <set>Qt::ImhNone</set>
+    <set>Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText|Qt::ImhSensitiveData</set>
+   </property>
+   <property name="echoMode">
+    <enum>QLineEdit::Password</enum>
    </property>
    <property name="placeholderText">
     <string>Password</string>

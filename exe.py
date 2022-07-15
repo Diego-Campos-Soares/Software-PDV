@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox
 from GIT_PDV.gui import *
 from login import Ui_Login
 import mysql.connector
+from mysql.connector import Error
 import sys
 
 
@@ -34,9 +35,15 @@ class Login(QWidget, Ui_Login):
             self.close()
             self.w.show()
         else:
-            QMessageBox.about(self,"Error","Usuario Nao Cadastrado")
+            self.show_MessageBox()
 
-            #print("Usuario Nao Cadastrado")
+    def show_MessageBox(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setWindowTitle("Error")
+        msg.setText("Usuario Nao Cadastrado")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.exec_()
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -153,6 +160,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.tabela_cliente.setItem(row, column,QTableWidgetItem(str(data)))
 
     def apagar_clientes(self):
+        #QMessageBox.about(MainWindow,"Confirmar Acao?","Esta Acao excluira todos os itens deseja confirmar?")
         apagar_clientes = f"""DROP TABLE clientes"""
 
         criar_clientes = f"""CREATE TABLE IF NOT EXISTS`CLIENTES`(
@@ -218,23 +226,40 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.tabela_prodtuos.setItem(row, column, QTableWidgetItem(str(data)))
 
     def apagar_produtos(self):
-        apagar_produto = f"""DROP TABLE produtos"""
+        #self.show_MessageBox()
+        try:
+            apagar_produto = f"""DROP TABLE produtos"""
 
-        criar_produto = f"""CREATE TABLE IF NOT EXISTS `jc_vidros`.`produtos` (
-                `id` INT(11) NOT NULL,
-                `produto` VARCHAR(45) NULL,
-                `descricao` VARCHAR(60) NULL,
-                `altura` DECIMAL(4,2) NULL,
-                `largura` DECIMAL(4,2) NULL,
-                `valor` DECIMAL(6,2) NULL,
-                `comprimento` DECIMAL(4,2) NULL,
-                PRIMARY KEY (`id`))
-                ENGINE = InnoDB
-                DEFAULT CHARACTER SET = utf8mb4;"""
-        cursor.execute(apagar_produto)
-        cursor.execute(criar_produto)
-        print(criar_produto)
-        con.commmit()
+            criar_produto = f"""CREATE TABLE IF NOT EXISTS `produtos` (
+                    `id` INT(11) NOT NULL,
+                    `produto` VARCHAR(45) NULL,
+                    `descricao` VARCHAR(60) NULL,
+                    `altura` DECIMAL(4,2) NULL,
+                    `largura` DECIMAL(4,2) NULL,
+                    `valor` DECIMAL(6,2) NULL,
+                    `comprimento` DECIMAL(4,2) NULL,
+                     PRIMARY KEY (id)
+                    )DEFAULT CHARACTER SET = utf8mb4;"""
+            cursor.execute(apagar_produto)
+            cursor.execute(criar_produto)
+
+            con.commmit()
+
+        except Error:
+            print(Error)
+
+        finally:
+            print(apagar_produto)
+            print(criar_produto)
+
+    def show_MessageBox(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setWindowTitle("Confirmar Acao")
+        msg.setText("ESTA ACAO EXCLUIRA TODOS OS ITENS DA TABELA,"
+                    "DESEJA CONFIRMAR ACAO??")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg.exec_()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
