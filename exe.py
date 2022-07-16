@@ -1,6 +1,10 @@
 from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox
-from GIT_PDV.gui import *
+from PyQt5 import QtGui, QtWidgets
+from gui import *
 from login import Ui_Login
+from gen_pdf import gen_pdv
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 import mysql.connector
 from mysql.connector import Error
 import sys
@@ -59,7 +63,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_atualizar_produto.clicked.connect(self.mostrar_produtos)
         self.btn_att_cliente.clicked.connect(self.mostrar_clientes)
         self.btn_limpar_cliente.clicked.connect(self.apagar_clientes)
-        self.btn_limpar_produto.clicked.connect(self.apagar_produtos)
+        self.btn_limpar_produto.clicked.connect(self.show_MessageBox)
+        self.btn_imprimir.clicked.connect(gen_pdv)
 
         ############################   PAGINAS DO SISTEMA   ##############################
 
@@ -176,10 +181,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
          `celular` INT(11) UNIQUE,
          PRIMARY KEY(id)
          )DEFAULT CHARSET = utf8mb4;"""
-        cursor.execute(apagar_clientes)
-        cursor.execute(criar_clientes)
-        print(criar_clientes)
-        con.commmit()
+        if con.is_connected():
+            cursor.execute(apagar_clientes)
+            cursor.execute(criar_clientes)
+            print(criar_clientes)
+            
 
     def cadastro_orcamento(self):
         produto = self.box_produto.value()
@@ -225,33 +231,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             for column, data in enumerate(text):
                 self.tabela_prodtuos.setItem(row, column, QTableWidgetItem(str(data)))
 
-    def apagar_produtos(self):
-        #self.show_MessageBox()
-        try:
-            apagar_produto = f"""DROP TABLE produtos"""
-
-            criar_produto = f"""CREATE TABLE IF NOT EXISTS `produtos` (
-                    `id` INT(11) NOT NULL,
-                    `produto` VARCHAR(45) NULL,
-                    `descricao` VARCHAR(60) NULL,
-                    `altura` DECIMAL(4,2) NULL,
-                    `largura` DECIMAL(4,2) NULL,
-                    `valor` DECIMAL(6,2) NULL,
-                    `comprimento` DECIMAL(4,2) NULL,
-                     PRIMARY KEY (id)
-                    )DEFAULT CHARACTER SET = utf8mb4;"""
-            cursor.execute(apagar_produto)
-            cursor.execute(criar_produto)
-
-            con.commmit()
-
-        except Error:
-            print(Error)
-
-        finally:
-            print(apagar_produto)
-            print(criar_produto)
-
     def show_MessageBox(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
@@ -259,7 +238,40 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         msg.setText("ESTA ACAO EXCLUIRA TODOS OS ITENS DA TABELA,"
                     "DESEJA CONFIRMAR ACAO??")
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg.buttonClicked.connect(self.what_button)
         msg.exec_()
+
+    def what_button(self, dialog_button):
+        btn = dialog_button.text()
+        if btn == "OK":
+            try:
+                apagar_produto = f"""DROP TABLE produtos"""
+
+                criar_produto = f"""CREATE TABLE IF NOT EXISTS `produtos` (
+                                `id` INT(11) NOT NULL,
+                                `produto` VARCHAR(45) NULL,
+                                `descricao` VARCHAR(60) NULL,
+                                `altura` DECIMAL(4,2) NULL,
+                                `largura` DECIMAL(4,2) NULL,
+                                `valor` DECIMAL(6,2) NULL,
+                                `comprimento` DECIMAL(4,2) NULL,
+                                 PRIMARY KEY (id)
+                                )DEFAULT CHARACTER SET = utf8mb4;"""
+                cursor.execute(apagar_produto)
+                cursor.execute(criar_produto)
+
+            except Error:
+                print(Error)
+
+            finally:
+                print(apagar_produto)
+                print(criar_produto)
+
+        else:
+            print("Acao Cancelada")
+
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
