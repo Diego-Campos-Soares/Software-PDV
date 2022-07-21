@@ -9,8 +9,17 @@ import mysql.connector
 from mysql.connector import Error
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, time
+from datetime import date
+import os
 
+tempo = datetime.now()
+
+data = tempo.strftime("%x")
+
+hora = tempo.strftime("%X")
+
+resumed = data + " " + hora
 
 con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
 cursor = con.cursor(buffered=True)
@@ -19,7 +28,6 @@ if con.is_connected():
     db_info = con.get_server_info()
     print("conectado ao servidor msql versao", db_info)
 
-data = datetime.now()
 
 class Login(QWidget, Ui_Login):
     def __init__(self) -> None:
@@ -67,19 +75,30 @@ class Login(QWidget, Ui_Login):
             msg.exec_()
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, user):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         self.setMinimumSize(1000, 800)
 
-        # if user.lower() == "admin":
-        #     self.btn_Usuario.setVisible(True)
-        # elif user.lower() == "user":
-        #     self.btn_Usuario.setVisible(False)
+        if user.lower() == "admin":
+            self.btn_Usuario.setVisible(True)
+        elif user.lower() == "user":
+            self.btn_Usuario.setVisible(False)
+
+        ############################   PAGINAS DO SISTEMA   ##############################
+
+        self.btn_PDV.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.PDV))
+        self.btn_produtos.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Produtos))
+        self.btn_caixa.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
+        self.btn_vendas.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Vendas))
+        self.btn_cliente.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Clientes))
+        self.btn_Usuario.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
+
+
 
         ########################    BOTOES SALVAR   ###############################
         self.btn_novo_cadastro.clicked.connect(self.cadastro_cliente)
-        self.btn_salvar_selecao.clicked.connect(self.cadastro_orcamento)
+        #self.btn_salvar_selecao.clicked.connect(self.cadastro_orcamento)
         self.btn_salvar_produto.clicked.connect(self.cadastro_produto)
         self.btn_salvar_user.clicked.connect(self.cadastro_usuario)
         ########################    BOTOES ATUALIZAR    ############################
@@ -96,29 +115,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
 
-        ############################   PAGINAS DO SISTEMA   ##############################
 
-        self.btn_PDV.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.PDV))
-        self.btn_produtos.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Produtos))
-        self.btn_caixa.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
-        self.btn_vendas.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Vendas))
-        self.btn_cliente.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Clientes))
-        self.btn_Usuario.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
 
         ###########################     COMBO_BOX       ####################################
         #self.combo_projeto.currentIndexChanged.connect(self.endereco_combo)
         #self.combo_modelo.currentIndexChanged.connect(self.index_modelo)
 
         self.box_produto.valueChanged.connect(self.select_produto)
+        self.combo_modelo.currentIndexChanged.connect(self.imageUpdate)
 
         #self.endereco_combo()
         self.mostrar_clientes()
         self.mostrar_produtos()
         self.select_produto()
+        self.path_arquivos()
         # self.add_item()
 
         self.btn_limpar_user.clicked.connect(self.apagar_usuario)
         self.btn_open_file.clicked.connect(self.openFile)
+        self.btn_add.clicked.connect(self.consult_orcamento)
 
     # def endereco_combo(self):
     #     projeto = self.combo_projeto.currentIndex()
@@ -155,12 +170,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     #     dados_lidos = cursor.fetchall()
     #     for j in dados_lidos:
     #         self.combo_modelo.addItems(j)
+
+    def imageUpdate(self):
+        imagePath = "C:/Users/PC/PycharmProjects/pythonProject1/GIT_PDV/resized"
+        currentItem = str(self.combo_modelo.currentText())
+        currentImage = '%s/%s.png' % (imagePath, currentItem)
+        self.img_projeto.setPixmap(QtGui.QPixmap(currentImage))
+
+    def path_arquivos(self):
+        for _, _, arquivo in os.walk('C:/Users/PC/PycharmProjects/pythonProject1/GIT_PDV/resized'):
+            for i in arquivo:
+                final = i[:-4]
+                lista = [final]
+                self.combo_modelo.addItems(lista)
+
     def openFile(self):
-        directory = QtWidgets.QFileDialog.getOpenFileName(self, "Abrir Arquivo" ,'C:\PC\Desktop', "Arquivos de Texto (*.txt)")[0]
-        with open(directory, 'r') as a:
-            myList = [ ''.join(line.split()) for line in a ]
-        self.combo_modelo.addItems(myList)
-        #self.img_projeto.setPixMap(myList)
+        directory = QtWidgets.QFileDialog.getExistingDirectory()
+        for _, _, arquivo in os.walk(directory):
+            for items in arquivo:
+                final = items[:-4]
+                lista = [final]
+                print(lista)
+                self.combo_modelo.addItems(lista)
 
     def fechar_conexao(self):
         if con.is_connected():
@@ -181,9 +212,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         celular = self.line_celular.text()
 
         inserir_clientes = f"""insert into clientes
-                                 (cliente, orcamento, bairro, cidade, endereço, uf, telefone, celular)
+                                 (cliente, orcamento, bairro, cidade, endereço, uf, telefone, celular, data)
                                  values
-                                 ('{nome}', '{orcamento}', '{bairro}', '{cidade}', '{endereco}', '{estado}', '{telefone}', '{celular}')"""
+                                 ('{nome}', '{orcamento}', '{bairro}', '{cidade}', '{endereco}', '{estado}', '{telefone}', '{celular}', '{resumed}')"""
 
         con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
         cursor = con.cursor(buffered=True)
@@ -273,17 +304,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             print("Acao Cancelada")
 
-    def cadastro_orcamento(self):
+    def consult_orcamento(self):
         produto = self.box_produto.value()
         quantidade = self.box_quantidade.value()
         altura = self.box_altura.value()
         largura = self.box_largura.value()
 
-        declaracao = f"""insert into orcamento
-                            (produto, quantidade, altura, largura)
-                            values 
-                            ('{produto}', '{quantidade}', ' {altura}', ' {largura})'"""
-        print(declaracao)
+        consult = f"""SELECT valor FROM produtos WHERE ID= '{produto}'"""
+
+        m2 = altura * largura
+
+        cursor.execute(consult)
+        result = cursor.fetchone()
+        print(result[0])
+        print(m2)
+
+
+
 
     def cadastro_produto(self):
 
@@ -381,17 +418,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         cod = self.box_produto.value()
 
-        consult = f"""SELECT produto, valor FROM produtos WHERE ID ={cod}"""
+        consult = f"""SELECT produto FROM produtos WHERE ID ={cod}"""
         #val = f"""SELECT valor FROM produtos WHERE ID = '{cod}'"""
 
         if con.is_connected():
             cursor.execute(consult)
-            produto = cursor.fetchall()
+            produto = cursor.fetchone()
             #cursor.execute(val)
             #valor = cursor.fetchone()
-            #for i in produto:
 
-            self.combo_produto.addItems(produto)
+            if produto == "":
+                for i in produto:
+                    self.combo_produto.clear()
+                    self.combo_produto.addItem("PRODUTO INDEFINIDO")
+            else:
+                for i in produto:
+                    self.combo_produto.clear()
+                    self.combo_produto.addItem(i)
 
 
 
@@ -535,7 +578,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     login = Login()
-    #login.show()
-    w = MainWindow()
-    w.show()
+    login.show()
+    #w = MainWindow()
+    #w.show()
     sys.exit(app.exec_())
