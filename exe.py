@@ -1,16 +1,12 @@
 from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox, QFileDialog
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import uic
 from gui import *
 from login import Ui_Login
 from gen_pdf import gen_pdv
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
 import mysql.connector
 from mysql.connector import Error
-import re
 import sys
-from datetime import datetime, time
-from datetime import date
+from datetime import datetime
 import os
 
 tempo = datetime.now()
@@ -21,7 +17,8 @@ hora = tempo.strftime("%X")
 
 resumed = data + " " + hora
 
-con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
+con = mysql.connector.connect(
+    host="localhost", database="jc_vidros", user="root", password="")
 cursor = con.cursor(buffered=True)
 
 if con.is_connected():
@@ -36,7 +33,6 @@ class Login(QWidget, Ui_Login):
         self.setWindowTitle("Login")
         self.btn_login.clicked.connect(self.check_user)
         self.btn_login.clicked.connect(self.checkLogin)
-
 
     def check_user(self):
         user = self.user.text()
@@ -59,7 +55,6 @@ class Login(QWidget, Ui_Login):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.exec_()
 
-
     def checkLogin(self):
         autenticacao = self.check_user()
         if autenticacao == "Admin" or autenticacao == "User":
@@ -74,6 +69,7 @@ class Login(QWidget, Ui_Login):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, user):
         super(MainWindow, self).__init__()
@@ -87,18 +83,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         ############################   PAGINAS DO SISTEMA   ##############################
 
-        self.btn_PDV.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.PDV))
-        self.btn_produtos.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Produtos))
-        self.btn_caixa.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
-        self.btn_vendas.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Vendas))
-        self.btn_cliente.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Clientes))
-        self.btn_Usuario.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
-
-
+        self.btn_PDV.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.PDV))
+        self.btn_produtos.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.Produtos))
+        self.btn_caixa.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.Caixa))
+        self.btn_vendas.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.Vendas))
+        self.btn_cliente.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.Clientes))
+        self.btn_Usuario.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.Usuario))
 
         ########################    BOTOES SALVAR   ###############################
         self.btn_novo_cadastro.clicked.connect(self.cadastro_cliente)
-        #self.btn_salvar_selecao.clicked.connect(self.cadastro_orcamento)
+        # self.btn_salvar_selecao.clicked.connect(self.cadastro_orcamento)
         self.btn_salvar_produto.clicked.connect(self.cadastro_produto)
         self.btn_salvar_user.clicked.connect(self.cadastro_usuario)
         ########################    BOTOES ATUALIZAR    ############################
@@ -108,6 +108,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_limpar_cliente.clicked.connect(self.apagar_clientes)
         self.btn_limpar_produto.clicked.connect(self.apagar_produtos)
 
+        ######################      BOTOES ALTERAR      #############################
+        self.btn_alt_cliente.clicked.connect(self.show_alt)
+
         # self.btn_limpar_user.clicked.connect(self.confirmar)
         ######################      IMPRIMIR PDF         ############################
         self.btn_imprimir.clicked.connect(gen_pdv)
@@ -115,16 +118,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
 
-
-
         ###########################     COMBO_BOX       ####################################
-        #self.combo_projeto.currentIndexChanged.connect(self.endereco_combo)
-        #self.combo_modelo.currentIndexChanged.connect(self.index_modelo)
-
         self.box_produto.valueChanged.connect(self.select_produto)
         self.combo_modelo.currentIndexChanged.connect(self.imageUpdate)
 
-        #self.endereco_combo()
+        # self.endereco_combo()
         self.mostrar_clientes()
         self.mostrar_produtos()
         self.select_produto()
@@ -171,6 +169,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     #     for j in dados_lidos:
     #         self.combo_modelo.addItems(j)
 
+    def show_alt(self):
+        alt_cliente.show()
+
     def imageUpdate(self):
         imagePath = "C:/Users/PC/PycharmProjects/pythonProject1/GIT_PDV/resized"
         currentItem = str(self.combo_modelo.currentText())
@@ -216,7 +217,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                  values
                                  ('{nome}', '{orcamento}', '{bairro}', '{cidade}', '{endereco}', '{estado}', '{telefone}', '{celular}', '{resumed}')"""
 
-        con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
+        con = mysql.connector.connect(
+            host="localhost", database="jc_vidros", user="root", password="")
         cursor = con.cursor(buffered=True)
 
         if con.is_connected():
@@ -238,7 +240,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 msg.exec_()
 
     def mostrar_clientes(self):
-        con = mysql.connector.connect(host="localhost", database="jc_vidros", user="root", password="")
+        con = mysql.connector.connect(
+            host="localhost", database="jc_vidros", user="root", password="")
         cursor = con.cursor(buffered=True)
 
         if con.is_connected():
@@ -250,7 +253,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
                 for row, text in enumerate(dados_lidos):
                     for column, data in enumerate(text):
-                        self.tabela_cliente.setItem(row, column, QTableWidgetItem(str(data)))
+                        self.tabela_cliente.setItem(
+                            row, column, QTableWidgetItem(str(data)))
             except Error as error:
                 print(f"Erro ao mostrar cliente: {error}")
 
@@ -319,9 +323,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print(result[0])
         print(m2)
 
-
-
-
     def cadastro_produto(self):
 
         cod = self.box_codigo_produto.value()
@@ -365,7 +366,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         for row, text in enumerate(dados_lidos):
             for column, data in enumerate(text):
-                self.tabela_prodtuos.setItem(row, column, QTableWidgetItem(str(data)))
+                self.tabela_prodtuos.setItem(
+                    row, column, QTableWidgetItem(str(data)))
 
     def apagar_produtos(self):
         msg = QMessageBox()
@@ -424,7 +426,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if con.is_connected():
             cursor.execute(consult)
             produto = cursor.fetchone()
-            #cursor.execute(val)
+            # cursor.execute(val)
             #valor = cursor.fetchone()
 
             if produto == "":
@@ -437,11 +439,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     self.combo_produto.addItem(i)
 
 
-
 # list.append(i)
-
-
-
 
             # if produto == None:
             #     result = "PRODUTO INDEFINIDO"
@@ -456,7 +454,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             #     for f in valor:
             #         self.line_Valor_unit.clear()
             #         self.line_Valor_unit.setText(f[0])
-
 
     # def add_item(self):
     #     cod = self.box_produto.value()
@@ -476,6 +473,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     # print(dados)
 
+
     def apagar_usuario(self):
         apagar_usuarios = f"""DROP TABLE IF EXISTS usuarios"""
 
@@ -493,7 +491,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                 DEFAULT CHARACTER SET = utf8mb4;"""
 
         master_user = "INSERT INTO `jc_vidros`.`usuarios` (`nome`, `user`, `senha`, `perfil`) VALUES ('Master', 'Admin', 'Admin', 'Administrador');"
-
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
@@ -559,9 +556,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 msg.setText("Usuarios Cadastrado Com Sucesso")
                 msg.exec_()
 
-
-
-
     def cancelar_cliente(self):
         self.box_cliente.clear()
         self.line_cliente.clear()
@@ -574,11 +568,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.line_orcamento.clear()
 
 
-
+#tela_inserir = uic.loadUi('tela_inserir.ui')
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    alt_cliente = uic.loadUi("alterar_clientes.ui")
+    excluir_cliente = uic.loadUi("excluir_clientes.ui")
+    inserir_cliente = uic.loadUi("inserir_clientes.ui")
     login = Login()
     login.show()
     #w = MainWindow()
-    #w.show()
+    # w.show()
     sys.exit(app.exec_())

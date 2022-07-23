@@ -1,0 +1,41 @@
+{
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.colorTheme": "Pycharm Original Theme",
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "python.languageServer": "Default",
+    "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\cmd.exe",
+    "python.venvPath": "~/venv",
+    "editor.formatOnSave": true,
+    "editor.rulers": [80, 120],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      ".vscode": true,
+      "**/*.pyc": true
+    },
+    "files.associations": {
+      "**/*.html": "html",
+      "**/templates/**/*.html": "django-html",
+      "**/templates/**/*": "django-txt",
+      "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+    },
+    "workbench.editor.enablePreview": false,
+    "editor.minimap.enabled": false,
+    "python.linting.pylintArgs": ["--load-plugins", "pylint_django"],
+    "djangointellisense.projectRoot": "~/",
+    "djangointellisense.settingsModule": "penergetic.settings",
+    "emmet.includeLanguages": { "django-html": "html" },
+    "python.formatting.autopep8Args": [
+      "--max-line-length",
+      "120",
+      "--experimental"
+    ],
+    "python.formatting.blackPath": "",
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+  }

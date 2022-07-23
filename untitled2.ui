@@ -70,7 +70,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="PDV">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -176,7 +176,7 @@
               <x>10</x>
               <y>110</y>
               <width>71</width>
-              <height>44</height>
+              <height>50</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -208,7 +208,7 @@
               <x>10</x>
               <y>10</y>
               <width>71</width>
-              <height>42</height>
+              <height>50</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -304,7 +304,7 @@
               <x>560</x>
               <y>110</y>
               <width>131</width>
-              <height>44</height>
+              <height>50</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -368,7 +368,7 @@
               <x>700</x>
               <y>110</y>
               <width>131</width>
-              <height>44</height>
+              <height>50</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -400,7 +400,7 @@
               <x>700</x>
               <y>10</y>
               <width>135</width>
-              <height>44</height>
+              <height>50</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -482,7 +482,7 @@
            <widget class="QLabel" name="img_projeto">
             <property name="geometry">
              <rect>
-              <x>510</x>
+              <x>530</x>
               <y>180</y>
               <width>421</width>
               <height>401</height>
@@ -520,6 +520,29 @@
              <string>Open</string>
             </property>
            </widget>
+           <widget class="QTextEdit" name="desc_cliente">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>260</y>
+              <width>321</width>
+              <height>131</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QLabel" name="Obs">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>230</y>
+              <width>47</width>
+              <height>13</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Obs:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
           </widget>
           <widget class="QWidget" name="selecao_de_itens">
            <attribute name="title">
@@ -531,7 +554,7 @@
               <x>10</x>
               <y>10</y>
               <width>71</width>
-              <height>44</height>
+              <height>51</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -552,7 +575,7 @@
              <rect>
               <x>610</x>
               <y>100</y>
-              <width>158</width>
+              <width>168</width>
               <height>26</height>
              </rect>
             </property>
@@ -643,7 +666,7 @@
               <x>10</x>
               <y>80</y>
               <width>261</width>
-              <height>51</height>
+              <height>53</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -836,7 +859,7 @@
               <x>580</x>
               <y>490</y>
               <width>281</width>
-              <height>31</height>
+              <height>36</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_30">
@@ -862,7 +885,7 @@
               <x>540</x>
               <y>10</y>
               <width>231</width>
-              <height>46</height>
+              <height>52</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2168,11 +2191,14 @@
         <property name="contextMenuPolicy">
          <enum>Qt::DefaultContextMenu</enum>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
         <property name="showGrid">
          <bool>false</bool>
         </property>
         <property name="columnCount">
-         <number>11</number>
+         <number>10</number>
         </property>
         <column>
          <property name="text">
@@ -2186,7 +2212,7 @@
         </column>
         <column>
          <property name="text">
-          <string>Orçamento</string>
+          <string>Descriçao</string>
          </property>
         </column>
         <column>
@@ -2202,11 +2228,6 @@
         <column>
          <property name="text">
           <string>Endereço</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>New Column</string>
          </property>
         </column>
         <column>
@@ -2252,13 +2273,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btn_limpar_cliente">
+          <widget class="QPushButton" name="pushButton">
            <property name="text">
-            <string>Limpar</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../Desktop/icons/warning-icon-png-2771.png</normaloff>../../../Desktop/icons/warning-icon-png-2771.png</iconset>
+            <string>Excluir</string>
            </property>
           </widget>
          </item>
@@ -2270,6 +2287,17 @@
            <property name="icon">
             <iconset>
              <normaloff>../../../Desktop/icons/refresh.png</normaloff>../../../Desktop/icons/refresh.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_limpar_cliente">
+           <property name="text">
+            <string>Limpar</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../../Desktop/icons/warning-icon-png-2771.png</normaloff>../../../Desktop/icons/warning-icon-png-2771.png</iconset>
            </property>
           </widget>
          </item>
@@ -2354,7 +2382,7 @@
           <x>30</x>
           <y>120</y>
           <width>741</width>
-          <height>43</height>
+          <height>50</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -2424,7 +2452,7 @@
           <x>31</x>
           <y>231</y>
           <width>211</width>
-          <height>44</height>
+          <height>50</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -2459,7 +2487,7 @@
           <x>31</x>
           <y>281</y>
           <width>211</width>
-          <height>44</height>
+          <height>50</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -2481,7 +2509,7 @@
           <x>31</x>
           <y>331</y>
           <width>211</width>
-          <height>44</height>
+          <height>50</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2503,7 +2531,7 @@
           <x>31</x>
           <y>381</y>
           <width>211</width>
-          <height>51</height>
+          <height>52</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_21">
