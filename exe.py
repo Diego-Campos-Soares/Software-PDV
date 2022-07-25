@@ -116,6 +116,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_add.clicked.connect(self.consult_orcamento)
         self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
 
+    def alt_cliente(self):
+        #ideia usando return
+        cliente = self.alt_cliente.alt_cliente.text()
+        if cliente != "":
+            consult = db.select_cliente()
+            return consult[0]
+
     def excluir_cliente(self):
 
         cliente, okPressed = QtWidgets.QInputDialog.getText(self,"Excluir Cliente", "Digite o Nome Do Cliente")
