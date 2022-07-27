@@ -48,6 +48,23 @@ class Data_base:
         result = c.fetchall()
         return result
 
+    def select_one_user(self, user):
+
+        c = self.con.cursor(buffered=True)
+        sql = f"SELECT nome from usuarios WHERE nome = '{user}'"
+        c.execute(sql)
+        result = c.fetchall()
+        return result
+
+    def excluir_user(self, user):
+        try:
+            c = self.con.cursor(buffered=True)
+            sql = (f"DELETE from usuarios WHERE nome = %s")
+            c.execute(sql, [user])
+            self.con.commit()
+        except Error as error:
+            print(error)
+
     def insert_user(self, nome, email, user, senha, perfil):
         c = self.con.cursor(buffered=True)
         c.execute(f"INSERT INTO `jc_vidros`.`usuarios` (`nome`, `email`, `user`, `senha`, `perfil`) VALUES ('{nome}', '{email}', '{user}', '{senha}', '{perfil}');")
@@ -94,19 +111,21 @@ class Data_base:
         self.con.commit()
 
     def excluir_cliente(self, cliente):
-        c = self.con.cursor(buffered=True)
-        c.execute(f"SELECT cliente from clientes WHERE cliente = '{cliente}'")
-        result = c.fetchone()
-        cliente_db = result.replace("()", "")
-
-        if result[0] == cliente:
-            c.execute(f"DELETE from clientes WHERE cliente = '{cliente}'")
+        try:
+            c = self.con.cursor(buffered=True)
+            sql = (f"DELETE from clientes WHERE cliente = %s")
+            c.execute(sql, [cliente])
             self.con.commit()
-        elif result[0] != cliente:
-            print("Cliente Invalido")
-        else:
-            print("E ai")
+        except Error as error:
+            print(error)
 
+    def read_one_cliente(self, cliente):
+
+        c = self.con.cursor(buffered=True)
+        sql = f"SELECT cliente from clientes WHERE cliente = '{cliente}'"
+        c.execute(sql)
+        result = c.fetchall()
+        return result
 
 ############ PRODUTOS   ###############
 
@@ -115,6 +134,23 @@ class Data_base:
         c.execute("select * from produtos")
         produtos = c.fetchall()
         return produtos
+
+    def select_one_produto(self, produto):
+
+        c = self.con.cursor(buffered=True)
+        sql = f"SELECT produto from produtos WHERE ID = '{produto}'"
+        c.execute(sql)
+        result = c.fetchall()
+        return result
+
+    def excluir_produto(self, produto):
+        try:
+            c = self.con.cursor(buffered=True)
+            sql = (f"DELETE from produtos WHERE ID = %s")
+            c.execute(sql, [produto])
+            self.con.commit()
+        except Error as error:
+            print(error)
 
     def insert_produto(self, cod, produto, desc, alt, lar, val, com):
         c = self.con.cursor()
