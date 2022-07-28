@@ -16,7 +16,7 @@ class Data_base:
         except:
             pass
 
-############ USUARIOS   ##############
+#########################################   USUARIOS   ####################################################
 
     def create_user(self):
         c = self.con.cursor(buffered=True)
@@ -70,7 +70,7 @@ class Data_base:
         c.execute(f"INSERT INTO `jc_vidros`.`usuarios` (`nome`, `email`, `user`, `senha`, `perfil`) VALUES ('{nome}', '{email}', '{user}', '{senha}', '{perfil}');")
         self.con.commit()
 
-######### CLIENTES  ################
+#########################################   CLIENTES  #####################################################
 
     def create_clientes(self):
         c = self.con.cursor(buffered=True)
@@ -122,12 +122,13 @@ class Data_base:
     def read_one_cliente(self, cliente):
 
         c = self.con.cursor(buffered=True)
-        sql = f"SELECT cliente from clientes WHERE cliente = '{cliente}'"
+        sql = f"SELECT * from clientes WHERE cliente = '{cliente}'"
         c.execute(sql)
         result = c.fetchall()
         return result
 
-############ PRODUTOS   ###############
+
+#########################################   PRODUTOS     ##################################################
 
     def select_all_produto(self):
         c = self.con.cursor()

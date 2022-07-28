@@ -95,7 +95,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_excluir_user.clicked.connect(self.excluir_usuario)
 
         # BOTOES ALTERAR
-        # self.btn_alt_cliente.clicked.connect(self.show_alt)
+        self.btn_alt_cliente.clicked.connect(self.filter_cliente)
 
         # IMPRIMIR PDF
         self.btn_imprimir.clicked.connect(gen_pdv)
@@ -122,6 +122,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     #     if cliente != "":
     #         consult = db.select_cliente()
     #         return consult[0]
+
+    # def filter_cliente(self):
+    #     cliente = self.lineEdit_2.text()
+    #     c = db.read_one_cliente(cliente)
+    #     print(c)
+    #     self.tabela_cliente.clearContents()
+    #     #collum = 0
+    #     for l in range(0,len(c)):
+    #         for i in range(0, 15):
+    #             print(l)
+    #             self.tabela_cliente.setItem(l, i, QTableWidgetItem(str(c)))
+    #             #collum += 1
+            
+        
 
     def excluir_usuario(self):
         user, okPressed = QtWidgets.QInputDialog.getText(self, "Excluir Usuario", "Digite o Nome Do Usuario")
