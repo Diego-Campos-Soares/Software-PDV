@@ -123,19 +123,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     #         consult = db.select_cliente()
     #         return consult[0]
 
-    # def filter_cliente(self):
-    #     cliente = self.lineEdit_2.text()
-    #     c = db.read_one_cliente(cliente)
-    #     print(c)
-    #     self.tabela_cliente.clearContents()
-    #     #collum = 0
-    #     for l in range(0,len(c)):
-    #         for i in range(0, 15):
-    #             print(l)
-    #             self.tabela_cliente.setItem(l, i, QTableWidgetItem(str(c)))
-    #             #collum += 1
-            
-        
+#########################################   USUARIOS   ####################################################
+
+    def cadastro_usuario(self):
+        nome = self.lineEdit_6.text()
+        email = self.lineEdit_8.text()
+        user = self.lineEdit_5.text()
+        senha = self.lineEdit_4.text()
+        perfil = self.combo_perfil_user_2.currentText()
+
+        try:
+            db.insert_user(nome, email, user, senha, perfil)
+            self.show_messagebox("Sucesso", "Usuario Cadastrado Com Sucesso")
+
+        except Error as error:
+            print(error)
+            self.show_messagebox("Error", "Erro Ao Cadastrar Usuario")
 
     def excluir_usuario(self):
         user, okPressed = QtWidgets.QInputDialog.getText(self, "Excluir Usuario", "Digite o Nome Do Usuario")
@@ -145,6 +148,91 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             db.excluir_user(user)
             self.show_messagebox("Usuario Apagado", "Usuario Apagado Com Sucesso")
+
+    def limpar_usuario(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Question)
+        msg.setWindowTitle("Confirmar Acao")
+        msg.setText("ESTA ACAO EXCLUIRA TODOS OS USUARIOS,"
+                    "DESEJA CONFIRMAR ACAO??")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        exec = msg.exec_()
+
+        if exec == QtWidgets.QMessageBox.Ok:
+
+            try:
+                db.drop_user()
+                db.create_user()
+            except Error as error:
+                self.show_messagebox("Error", error)
+
+            finally:
+                self.show_messagebox("Concluido", "Usuarios Apagados com Sucesso")
+        else:
+            print("Acao Cancelada")
+
+#########################################   CLIENTES  #####################################################
+
+    def cadastro_cliente(self):
+            # cod = self.box_cliente.value()
+            nome = self.line_cliente.text()
+            orcamento = self.line_orcamento.text()
+            bairro = self.line_bairro.text()
+            cidade = self.line_cidade.text()
+            endereco = self.line_endereco.text()
+            estado = self.line_estado.text()
+            # projeto = self.combo_projeto.text()
+            telefone = self.line_telefone.text()
+            celular = self.line_celular.text()
+
+            try:
+                db.insert_cliente(nome, orcamento, bairro, cidade, endereco, estado, telefone, celular, resumed)
+                self.mostrar_clientes()
+            except Error as error:
+                print(f"Erro ao inserir Cliente:{error}")
+                self.show_messagebox("Error", "Erro Ao Cadastrar Cliente")
+            finally:
+                self.show_messagebox("Cliente Cadastrado", "Cliente Cadastrado Com Sucesso")
+
+    def filter_cliente(self):
+        cliente = self.lineEdit_2.text()
+        rows = db.read_one_cliente(cliente)
+        self.tabela_cliente.clearContents()
+        for i in range(len(rows)): #linha
+            for j in range(len(rows[0])): #coluna
+                item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
+                self.tabela_cliente.setItem(i,j, item)
+                
+    def mostrar_clientes(self):
+        clientes = db.select_cliente()
+        self.tabela_cliente.clearContents()
+        self.tabela_cliente.setRowCount(len(clientes))
+
+        for row, text in enumerate(clientes):
+            for column, data in enumerate(text):
+                self.tabela_cliente.setItem(
+                    row, column, QTableWidgetItem(str(data)))
+        
+    def limpar_clientes(self):
+        
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Question)
+        msg.setWindowTitle("Confirmar Acao")
+        msg.setText("ESTA ACAO EXCLUIRA TODOS OS ITENS DA TABELA,"
+                    "DESEJA CONFIRMAR ACAO??")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        exec = msg.exec_()
+        if exec == QtWidgets.QMessageBox.Ok:
+            try:
+                db.drop_clientes()
+                db.create_clientes()
+                self.mostrar_clientes()
+            except Error as error:
+                self.show_messagebox("Error", error)
+            finally:
+                self.show_messagebox("Clientes Apagados", "Clientes Apagados Com Sucesso")
+        else:
+            print("Acao Cancelada")
 
     def excluir_cliente(self):
 
@@ -157,6 +245,59 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.show_messagebox("Cliente Apagado", "Cliente Apagado Com Sucesso")
             self.mostrar_clientes()
 
+    def cancelar_cliente(self):
+        self.box_cliente.clear()
+        self.line_cliente.clear()
+        self.line_bairro.clear()
+        self.line_cidade.clear()
+        self.line_celular.clear()
+        self.line_telefone.clear()
+        self.line_estado.clear()
+        self.line_endereco.clear()
+        self.line_orcamento.clear()
+
+#########################################   PRODUTOS     ##################################################
+
+    def cadastro_produto(self):
+
+            cod = self.box_codigo_produto.value()
+            produto = self.line_produto.text()
+            desc = self.line_descricao.text()
+            alt = self.box_altura_produto.value()
+            lar = self.box_largura_produto.value()
+            com = self.box_comprimento_produto.value()
+            val = self.box_valor_produto.value()
+            try:
+                db.insert_produto(cod, produto, desc, alt, lar, val, com)
+                self.show_messagebox("Concluido", "Produto Cadastrado Com Sucesso")
+                self.mostrar_produtos()
+            except Error as error:
+                self.show_messagebox("Erro", error)
+
+    def mostrar_produtos(self):
+        produtos = db.select_all_produto()
+
+        self.tabela_prodtuos.clearContents()
+        self.tabela_prodtuos.setRowCount(len(produtos))
+
+        for row, text in enumerate(produtos):
+            for column, data in enumerate(text):
+                self.tabela_prodtuos.setItem(
+                    row, column, QTableWidgetItem(str(data)))
+
+    def select_produto(self):
+        cod = self.box_produto.value()
+        produto = db.select_produto(cod)
+        if produto == []:
+            produto.append("PRODUTO INDEFINIDO")
+            for i in produto:
+                self.combo_produto.clear()
+
+        else:
+            for i in produto:
+                self.combo_produto.clear()
+                self.combo_produto.addItem(i)
+
     def excluir_produtos(self):
         produto, okPressed = QtWidgets.QInputDialog.getText(self, "Excluir Produto", "Digite o Codigo Do Produto")
         c = db.select_one_produto(produto)
@@ -167,6 +308,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.show_messagebox("Produto Apagado", "Produto Apagado Com Sucesso")
             self.mostrar_produtos()
 
+    def limpar_produtos(self):
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Question)
+            msg.setWindowTitle("Confirmar Acao")
+            msg.setText("ESTA ACAO EXCLUIRA TODOS OS ITENS DA TABELA,"
+                        "DESEJA CONFIRMAR ACAO??")
+            msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            exec = msg.exec_()
+
+            if exec == QtWidgets.QMessageBox.Ok:
+                try:
+                    db.drop_produto()
+                    db.create_produto()
+                    self.show_messagebox("Concluido", "Produtos Apagados Com Sucesso")
+                    self.mostrar_produtos()
+                except Error as error:
+                    self.show_messagebox("Error", error)
+            else:
+                print("Acao Cancelada")
 
     def imageUpdate(self):
         imagePath = "C:/Users/PC/PycharmProjects/pythonProject1/GIT_PDV/resized"
@@ -189,57 +349,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 lista = [final]
                 print(lista)
                 self.combo_modelo.addItems(lista)
-
-    def cadastro_cliente(self):
-        # cod = self.box_cliente.value()
-        nome = self.line_cliente.text()
-        orcamento = self.line_orcamento.text()
-        bairro = self.line_bairro.text()
-        cidade = self.line_cidade.text()
-        endereco = self.line_endereco.text()
-        estado = self.line_estado.text()
-        # projeto = self.combo_projeto.text()
-        telefone = self.line_telefone.text()
-        celular = self.line_celular.text()
-
-        try:
-            db.insert_cliente(nome, orcamento, bairro, cidade, endereco, estado, telefone, celular, resumed)
-            self.mostrar_clientes()
-        except Error as error:
-            print(f"Erro ao inserir Cliente:{error}")
-            self.show_messagebox("Error", "Erro Ao Cadastrar Cliente")
-        finally:
-            self.show_messagebox("Cliente Cadastrado", "Cliente Cadastrado Com Sucesso")
-
-    def mostrar_clientes(self):
-        clientes = db.select_cliente()
-        self.tabela_cliente.clearContents()
-        self.tabela_cliente.setRowCount(len(clientes))
-
-        for row, text in enumerate(clientes):
-            for column, data in enumerate(text):
-                self.tabela_cliente.setItem(
-                    row, column, QTableWidgetItem(str(data)))
-
-    def limpar_clientes(self):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Question)
-        msg.setWindowTitle("Confirmar Acao")
-        msg.setText("ESTA ACAO EXCLUIRA TODOS OS ITENS DA TABELA,"
-                    "DESEJA CONFIRMAR ACAO??")
-        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        exec = msg.exec_()
-        if exec == QtWidgets.QMessageBox.Ok:
-            try:
-                db.drop_clientes()
-                db.create_clientes()
-                self.mostrar_clientes()
-            except Error as error:
-                self.show_messagebox("Error", error)
-            finally:
-                self.show_messagebox("Clientes Apagados", "Clientes Apagados Com Sucesso")
-        else:
-            print("Acao Cancelada")
 
     def consult_orcamento(self):
         codigo = self.box_produto.value()
@@ -264,115 +373,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.line_valor_bruto.setText(str(bruto))
         self.line_lucro.setText(str(lucro))
         self.line_total.setText(str(total))
-
-    def cadastro_produto(self):
-
-        cod = self.box_codigo_produto.value()
-        produto = self.line_produto.text()
-        desc = self.line_descricao.text()
-        alt = self.box_altura_produto.value()
-        lar = self.box_largura_produto.value()
-        com = self.box_comprimento_produto.value()
-        val = self.box_valor_produto.value()
-        try:
-            db.insert_produto(cod, produto, desc, alt, lar, val, com)
-            self.show_messagebox("Concluido", "Produto Cadastrado Com Sucesso")
-            self.mostrar_produtos()
-        except Error as error:
-            self.show_messagebox("Erro", error)
-
-    def mostrar_produtos(self):
-        produtos = db.select_all_produto()
-
-        self.tabela_prodtuos.clearContents()
-        self.tabela_prodtuos.setRowCount(len(produtos))
-
-        for row, text in enumerate(produtos):
-            for column, data in enumerate(text):
-                self.tabela_prodtuos.setItem(
-                    row, column, QTableWidgetItem(str(data)))
-
-    def limpar_produtos(self):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Question)
-        msg.setWindowTitle("Confirmar Acao")
-        msg.setText("ESTA ACAO EXCLUIRA TODOS OS ITENS DA TABELA,"
-                    "DESEJA CONFIRMAR ACAO??")
-        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        exec = msg.exec_()
-
-        if exec == QtWidgets.QMessageBox.Ok:
-            try:
-                db.drop_produto()
-                db.create_produto()
-                self.show_messagebox("Concluido", "Produtos Apagados Com Sucesso")
-                self.mostrar_produtos()
-            except Error as error:
-                self.show_messagebox("Error", error)
-        else:
-            print("Acao Cancelada")
-
-    def select_produto(self):
-        cod = self.box_produto.value()
-        produto = db.select_produto(cod)
-        if produto == []:
-            produto.append("PRODUTO INDEFINIDO")
-            for i in produto:
-                self.combo_produto.clear()
-
-        else:
-            for i in produto:
-                self.combo_produto.clear()
-                self.combo_produto.addItem(i)
-
-
-    def limpar_usuario(self):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Question)
-        msg.setWindowTitle("Confirmar Acao")
-        msg.setText("ESTA ACAO EXCLUIRA TODOS OS USUARIOS,"
-                    "DESEJA CONFIRMAR ACAO??")
-        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        exec = msg.exec_()
-
-        if exec == QtWidgets.QMessageBox.Ok:
-
-            try:
-                db.drop_user()
-                db.create_user()
-            except Error as error:
-                self.show_messagebox("Error", error)
-
-            finally:
-                self.show_messagebox("Concluido", "Usuarios Apagados com Sucesso")
-        else:
-            print("Acao Cancelada")
-
-    def cadastro_usuario(self):
-        nome = self.lineEdit_6.text()
-        email = self.lineEdit_8.text()
-        user = self.lineEdit_5.text()
-        senha = self.lineEdit_4.text()
-        perfil = self.combo_perfil_user_2.currentText()
-
-        try:
-            db.insert_user(nome, email, user, senha, perfil)
-            self.show_messagebox("Sucesso", "Usuario Cadastrado Com Sucesso")
-
-        except Error as error:
-            print(error)
-            self.show_messagebox("Error", "Erro Ao Cadastrar Usuario")
-
-    def cancelar_cliente(self):
-        self.box_cliente.clear()
-        self.line_cliente.clear()
-        self.line_bairro.clear()
-        self.line_cidade.clear()
-        self.line_celular.clear()
-        self.line_telefone.clear()
-        self.line_estado.clear()
-        self.line_endereco.clear()
-        self.line_orcamento.clear()
 
     def show_messagebox(self, title, text):
         msg = QMessageBox()
