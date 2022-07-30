@@ -23,6 +23,7 @@ class Login(QWidget, Ui_Login):
         self.setWindowTitle("Login")
         self.btn_login.clicked.connect(self.check_user)
         self.btn_login.clicked.connect(self.checkLogin)
+        #self.btn_login.activated.connect(self.checkLogin)
         QShortcut("Return", self.btn_login).activated.connect(self.checkLogin)
 
     def check_user(self):
@@ -59,15 +60,15 @@ class Login(QWidget, Ui_Login):
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, user):
+    def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         self.setMinimumSize(1000, 800)
 
-        if user.lower() == "admin":
-            self.btn_Usuario.setVisible(True)
-        elif user.lower() == "user":
-            self.btn_Usuario.setVisible(False)
+        # if user.lower() == "admin":
+        #     self.btn_Usuario.setVisible(True)
+        # elif user.lower() == "user":
+        #     self.btn_Usuario.setVisible(False)
 
         ############################   PAGINAS DO SISTEMA   ##############################
 
@@ -96,7 +97,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_excluir_user.clicked.connect(self.excluir_usuario)
 
         # BOTOES ALTERAR
-        self.buscar_cliente.clicked.connect(self.selecionar_cliente)
+
+        # BOTOES BUSCAR
+        self.buscar_cliente.clicked.connect(self.exibir_cliente)
+        self.atalho(self.filter_cliente, self.exibir_cliente)
+        
+        self.buscar_produto.clicked.connect(self.exibir_produto)
+        self.atalho(self.buscar_produto, self.exibir_produto)
 
         # IMPRIMIR PDF
         self.btn_imprimir.clicked.connect(gen_pdv)
@@ -114,9 +121,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.btn_open_file.clicked.connect(self.openFile)
         self.btn_add.clicked.connect(self.consult_orcamento)
-        self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
-
+        
+        # BOTOES CANCELAR
         self.btn_remove.clicked.connect(self.cancelar_orcamento)
+        self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
 
     # def alt_cliente(self):
     #     #ideia usando return
@@ -196,7 +204,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             finally:
                 self.show_messagebox("Cliente Cadastrado", "Cliente Cadastrado Com Sucesso")
 
-    def selecionar_cliente(self):
+    def exibir_cliente(self):
         cliente = self.filter_cliente.text()
         rows = db.read_one_cliente(cliente)
         self.tabela_cliente.clearContents()
@@ -291,19 +299,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         cod = self.box_produto.value()
         produto = db.select_one_produto(cod)
         if produto == None:
-            produto = []
+            produto = ["PRODUTO INDEFINIDO"]
             for i in produto:
                 self.combo_produto.clear()
-                self.combo_produto.addItem(produto)
+                self.combo_produto.addItem(produto[0])
         #print(f"resultado da funcao:{produto}")
             
         else:
             for i in produto:
+                #i = "".join(str(i))
                 self.combo_produto.clear()
-                self.combo_produto.addItem(i)
-            #produto = "".join(str(produto))
+                self.combo_produto.addItem(i[0])
             
-
+            
     def excluir_produtos(self):
         produto, okPressed = QtWidgets.QInputDialog.getText(self, "Excluir Produto", "Digite o Codigo Do Produto")
         c = db.select_one_produto(produto)
@@ -333,6 +341,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     self.show_messagebox("Error", error)
             else:
                 print("Acao Cancelada")
+
+    def exibir_produto(self):
+        produto = self.filter_produto.text()
+        rows = db.read_one_produto(produto)
+        self.tabela_prodtuos.clearContents()
+        for i in range(len(rows)): #linha
+            for j in range(len(rows[0])): #coluna
+                item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
+                self.tabela_prodtuos.setItem(i,j, item)
+
+#########################################   OUTROS     #########################################
 
     def imageUpdate(self):
         imagePath = "C:/Users/Master/Desktop/Software-PDV/resized"
@@ -364,15 +383,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         lar = self.box_largura.value()
         lucro = self.box_lucro.value()
         desconto = self.box_desconto.value()
-
-        # lista = [codigo, produto, qt, alt, lar]
-        # self.tabela_selecao_itens.setRowCount(len(lista))
-        # for row, i in enumerate(lista):
-        #    for collum, text in range(len(i)):
-        #         self.tabela_selecao_itens.setItem(row, collum, QTableWidgetItem(str(text)))
-
+    
         valor_un = db.select_valor(codigo)
+        
+       
         if valor_un == None:
+            valor_un = [0]
             self.line_valor_bruto.setText("0")
 
         valor = "".join(str(valor_un[0]))
@@ -388,11 +404,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if desconto != 0.0:
             total = total - (total * desconto/100)
 
-
+        self.line_Valor_unit.setText(str(valor_un[0]))
         self.line_valor_bruto.setText(str(bruto))
         self.line_lucro.setText(str("{:.2f}".format(lucro)))
-        self.line_total.setText(str(total))
+        self.line_total.setText(str("{:.2f}".format(total)))
 
+        lista = [codigo, produto, qt, alt, lar, valor_un[0]]
+        for column, text in enumerate(lista):
+            self.tabela_selecao_itens.setItem(0, column, QTableWidgetItem(str(text)))
+
+
+        self.cancelar_orcamento()
 
     def show_messagebox(self, title, text):
         msg = QMessageBox()
@@ -402,19 +424,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         msg.exec_()
     
     def cancelar_orcamento(self):
-        self.box_produto.clear()
+        self.box_produto.setValue(0)
         self.combo_produto.clear()
-        self.box_quantidade.clear()
-        self.box_altura.clear()
-        self.box_largura.clear()
-        self.box_lucro.clear()
-        self.box_desconto.clear()
+        self.box_quantidade.setValue(0)
+        self.box_altura.setValue(0.00)
+        self.box_largura.setValue(0.00)
+        self.box_lucro.setValue(0.00)
+        self.box_desconto.setValue(0.00)
+        self.line_Valor_unit.clear()
 
+    def cancelar_produto(self):
+        #self.Produtos.QLineEdit.clear()
+        self.box_codigo_produto.clear()
+        # self.line_produto.clear()
+        # self.line_descricao.clear()
+        # self.box_altura_produto.clear()
+        # self.box_largura_produto.clear()
+        # self.box_comprimento_produto.clear()
+
+    def atalho(self, p, f):
+        QShortcut("Return" , p).activated.connect(f)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    login = Login()
-    login.show()
-    #w = MainWindow()
-    #w.show()
+    #login = Login()
+    #login.show()
+    w = MainWindow()
+    w.show()
     sys.exit(app.exec_())
