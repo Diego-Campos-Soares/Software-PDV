@@ -70,7 +70,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="PDV">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -960,7 +960,7 @@
              </font>
             </property>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>400</x>
@@ -982,7 +982,7 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>490</x>
@@ -1659,7 +1659,7 @@
          <rect>
           <x>160</x>
           <y>100</y>
-          <width>31</width>
+          <width>41</width>
           <height>31</height>
          </rect>
         </property>
@@ -2371,7 +2371,7 @@
          <rect>
           <x>159</x>
           <y>37</y>
-          <width>31</width>
+          <width>41</width>
           <height>31</height>
          </rect>
         </property>
