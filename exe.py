@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox, QFileDialog, QShortcut
 from gui import *
 from login import Ui_Login
 from gen_pdf import gen_pdv
@@ -96,7 +96,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_excluir_user.clicked.connect(self.excluir_usuario)
 
         # BOTOES ALTERAR
-        self.btn_alt_cliente.clicked.connect(self.filter_cliente)
+
+        # BOTOES BUSCAR
+        self.buscar_cliente.clicked.connect(self.exibir_cliente)
+        self.atalho(self.filter_cliente, self.exibir_cliente)
+        
+        self.buscar_produto.clicked.connect(self.exibir_produto)
+        self.atalho(self.buscar_produto, self.exibir_produto)
 
         # IMPRIMIR PDF
         self.btn_imprimir.clicked.connect(gen_pdv)
@@ -114,8 +120,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.btn_open_file.clicked.connect(self.openFile)
         self.btn_add.clicked.connect(self.consult_orcamento)
+        
+        # BOTOES CANCELAR
+        self.btn_remove.clicked.connect(self.cancelar_orcamento)
         self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
-
 
     # def alt_cliente(self):
     #     #ideia usando return
@@ -195,8 +203,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             finally:
                 self.show_messagebox("Cliente Cadastrado", "Cliente Cadastrado Com Sucesso")
 
-    def filter_cliente(self):
-        cliente = self.lineEdit_2.text()
+    def exibir_cliente(self):
+        cliente = self.filter_cliente.text()
         rows = db.read_one_cliente(cliente)
         self.tabela_cliente.clearContents()
         for i in range(len(rows)): #linha
@@ -288,17 +296,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def select_produto(self):
         cod = self.box_produto.value()
-        produto = db.select_produto(cod)
-        if produto == []:
-            produto.append("PRODUTO INDEFINIDO")
+        produto = db.select_one_produto(cod)
+        if produto == None:
+            produto = ["PRODUTO INDEFINIDO"]
             for i in produto:
                 self.combo_produto.clear()
-
+                self.combo_produto.addItem(produto[0])
+        #print(f"resultado da funcao:{produto}")
+            
         else:
             for i in produto:
+                #i = "".join(str(i))
                 self.combo_produto.clear()
-                self.combo_produto.addItem(i)
-
+                self.combo_produto.addItem(i[0])
+            
+            
     def excluir_produtos(self):
         produto, okPressed = QtWidgets.QInputDialog.getText(self, "Excluir Produto", "Digite o Codigo Do Produto")
         c = db.select_one_produto(produto)
@@ -329,14 +341,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 print("Acao Cancelada")
 
+    def exibir_produto(self):
+        produto = self.filter_produto.text()
+        rows = db.read_one_produto(produto)
+        self.tabela_prodtuos.clearContents()
+        for i in range(len(rows)): #linha
+            for j in range(len(rows[0])): #coluna
+                item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
+                self.tabela_prodtuos.setItem(i,j, item)
+
+#########################################   OUTROS     #########################################
+
     def imageUpdate(self):
-        imagePath = "C:/Users/PC/PycharmProjects/pythonProject1/GIT_PDV/resized"
+        imagePath = "C:/Users/Master/Desktop/Software-PDV/resized"
         currentItem = str(self.combo_modelo.currentText())
         currentImage = '%s/%s.png' % (imagePath, currentItem)
         self.img_projeto.setPixmap(QtGui.QPixmap(currentImage))
 
     def path_arquivos(self):
-        for _, _, arquivo in os.walk('C:/Users/PC/PycharmProjects/pythonProject1/GIT_PDV/resized'):
+        for _, _, arquivo in os.walk('C:/Users/Master/Desktop/Software-PDV/resized'):
             for i in arquivo:
                 final = i[:-4]
                 lista = [final]
@@ -357,23 +380,43 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         qt = self.box_quantidade.value()
         alt = self.box_altura.value()
         lar = self.box_largura.value()
-        # lista = [codigo, produto, qt, alt, lar]
-        # self.tabela_selecao_itens.setRowCount(len(lista))
-        # for row, i in enumerate(lista):
-        #    for collum, text in range(len(i)):
-        #         self.tabela_selecao_itens.setItem(row, collum, QTableWidgetItem(str(text)))
-
+        lucro = self.box_lucro.value()
+        desconto = self.box_desconto.value()
+    
         valor_un = db.select_valor(codigo)
-        valor = "".join(str(valor_un[0]))
-        bruto = float(valor) * alt * lar
+        
+       
+        if valor_un == None:
+            valor_un = [0]
+            self.line_valor_bruto.setText("0")
 
-        total = bruto + float(bruto * 30/100)
+        valor = "".join(str(valor_un[0]))
+        if qt != 0:
+            bruto = float(valor) * alt * lar * qt
+        else:
+            bruto = float(valor) * alt * lar
+
+
+        total = bruto + float(bruto * lucro/100)
         lucro = total - bruto
 
+        if desconto != 0.0:
+            total = total - (total * desconto/100)
 
-        self.line_valor_bruto.setText(str(bruto))
-        self.line_lucro.setText(str(lucro))
-        self.line_total.setText(str(total))
+        self.line_Valor_unit.setText(str(valor_un[0]))
+        self.line_valor_bruto.setText(str("{:.2f}".format(bruto)))
+        self.line_lucro.setText(str("{:.2f}".format(lucro)))
+        self.line_total.setText(str("{:.2f}".format(total)))
+        #row = 0
+        lista = [codigo, produto, qt, alt, lar, valor_un[0]]
+        for column, text in enumerate(lista):
+            #for row, data in enumerate(lista):
+            #row = self.tabela_selecao_itens.insertRow(row)
+            self.tabela_selecao_itens.setItem(0, column, QTableWidgetItem(str(text)))
+            #row += 1
+
+
+        self.cancelar_orcamento()
 
     def show_messagebox(self, title, text):
         msg = QMessageBox()
@@ -381,12 +424,33 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         msg.setWindowTitle(title)
         msg.setText(str(text))
         msg.exec_()
+    
+    def cancelar_orcamento(self):
+        self.box_produto.setValue(0)
+        self.combo_produto.clear()
+        self.box_quantidade.setValue(0)
+        self.box_altura.setValue(0.00)
+        self.box_largura.setValue(0.00)
+        self.box_lucro.setValue(0.00)
+        self.box_desconto.setValue(0.00)
+        self.line_Valor_unit.clear()
 
+    def cancelar_produto(self):
+        #self.Produtos.QLineEdit.clear()
+        self.box_codigo_produto.clear()
+        # self.line_produto.clear()
+        # self.line_descricao.clear()
+        # self.box_altura_produto.clear()
+        # self.box_largura_produto.clear()
+        # self.box_comprimento_produto.clear()
+
+    def atalho(self, p, f):
+        QShortcut("Return" , p).activated.connect(f)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    # login = Login()
-    # login.show()
+    #login = Login()
+    #login.show()
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())

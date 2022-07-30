@@ -120,7 +120,6 @@ class Data_base:
             print(error)
 
     def read_one_cliente(self, cliente):
-
         c = self.con.cursor(buffered=True)
         sql = f"SELECT * from clientes WHERE cliente = '{cliente}'"
         c.execute(sql)
@@ -137,12 +136,17 @@ class Data_base:
         return produtos
 
     def select_one_produto(self, produto):
-
         c = self.con.cursor(buffered=True)
         sql = f"SELECT produto from produtos WHERE ID = '{produto}'"
         c.execute(sql)
         result = c.fetchall()
-        print(f"resultado da consulta:{result[0]}")
+        return result
+   
+    def read_one_produto(self, produto):
+        c = self.con.cursor(buffered=True)
+        sql = f"SELECT * from produtos WHERE produto = '{produto}'"
+        c.execute(sql)
+        result = c.fetchall()
         return result
 
     def excluir_produto(self, produto):
