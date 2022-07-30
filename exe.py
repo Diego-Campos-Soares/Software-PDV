@@ -405,13 +405,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             total = total - (total * desconto/100)
 
         self.line_Valor_unit.setText(str(valor_un[0]))
-        self.line_valor_bruto.setText(str(bruto))
+        self.line_valor_bruto.setText(str("{:.2f}".format(bruto)))
         self.line_lucro.setText(str("{:.2f}".format(lucro)))
         self.line_total.setText(str("{:.2f}".format(total)))
-
+        #row = 0
         lista = [codigo, produto, qt, alt, lar, valor_un[0]]
         for column, text in enumerate(lista):
+            #for row, data in enumerate(lista):
+            #row = self.tabela_selecao_itens.insertRow(row)
             self.tabela_selecao_itens.setItem(0, column, QTableWidgetItem(str(text)))
+            #row += 1
 
 
         self.cancelar_orcamento()
