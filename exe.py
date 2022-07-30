@@ -23,6 +23,7 @@ class Login(QWidget, Ui_Login):
         self.setWindowTitle("Login")
         self.btn_login.clicked.connect(self.check_user)
         self.btn_login.clicked.connect(self.checkLogin)
+        
 
     def check_user(self):
         user = self.user.text()
