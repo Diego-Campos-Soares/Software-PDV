@@ -142,7 +142,6 @@ class Data_base:
         sql = f"SELECT produto from produtos WHERE ID = '{produto}'"
         c.execute(sql)
         result = c.fetchall()
-        print(f"resultado da consulta:{result[0]}")
         return result
 
     def excluir_produto(self, produto):

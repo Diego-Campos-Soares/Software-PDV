@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox, QFileDialog, QShortcut
 from gui import *
 from login import Ui_Login
 from gen_pdf import gen_pdv
@@ -23,6 +23,7 @@ class Login(QWidget, Ui_Login):
         self.setWindowTitle("Login")
         self.btn_login.clicked.connect(self.check_user)
         self.btn_login.clicked.connect(self.checkLogin)
+        QShortcut("Return", self.btn_login).activated.connect(self.checkLogin)
 
     def check_user(self):
         user = self.user.text()
