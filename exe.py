@@ -1,4 +1,11 @@
+from asyncio.windows_events import NULL
+from distutils.command import clean
+from gettext import textdomain
+import imp
+from turtle import clear
+import copy
 from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QMessageBox, QFileDialog, QShortcut
+from pyparsing import col
 from gui import *
 from login import Ui_Login
 from gen_pdf import gen_pdv
@@ -119,12 +126,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.path_arquivos()
 
         self.btn_open_file.clicked.connect(self.openFile)
-        self.btn_add.clicked.connect(self.consult_orcamento)
+        self.btn_add.clicked.connect(self.select_itens)
+        self.btn_add.clicked.connect(self.read_itens)
         
         # BOTOES CANCELAR
         self.btn_remove.clicked.connect(self.cancelar_orcamento)
         self.btn_cancelar_cadastro.clicked.connect(self.cancelar_cliente)
 
+        self.btn_remove.clicked.connect(self.remove_selecao)
     # def alt_cliente(self):
     #     #ideia usando return
     #     cliente = self.alt_cliente.alt_cliente.text()
@@ -374,7 +383,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 print(lista)
                 self.combo_modelo.addItems(lista)
 
-    def consult_orcamento(self):
+    def select_itens(self):
         codigo = self.box_produto.value()
         produto = self.combo_produto.currentText()
         qt = self.box_quantidade.value()
@@ -398,25 +407,45 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
         total = bruto + float(bruto * lucro/100)
-        lucro = total - bruto
 
         if desconto != 0.0:
             total = total - (total * desconto/100)
 
+        
+        lucro = total - bruto 
+
+       
         self.line_Valor_unit.setText(str(valor_un[0]))
         self.line_valor_bruto.setText(str("{:.2f}".format(bruto)))
         self.line_lucro.setText(str("{:.2f}".format(lucro)))
         self.line_total.setText(str("{:.2f}".format(total)))
-        #row = 0
+        self.selecao = self.tabela_selecao_itens
+
         lista = [codigo, produto, qt, alt, lar, valor_un[0]]
+        l = self.tabela_selecao_itens.rowCount()
+
         for column, text in enumerate(lista):
-            #for row, data in enumerate(lista):
-            #row = self.tabela_selecao_itens.insertRow(row)
-            self.tabela_selecao_itens.setItem(0, column, QTableWidgetItem(str(text)))
-            #row += 1
-
-
+            self.tabela_selecao_itens.setItem(l -1 , column, QTableWidgetItem(str(text)))
+        
+        l = self.tabela_selecao_itens.insertRow(l)
+      
         self.cancelar_orcamento()
+
+    def read_itens(self):
+        i = []
+        row = self.tabela_selecao_itens.rowCount()
+        column = self.tabela_selecao_itens.columnCount()
+        for row in range(row):
+             for column in range(column):
+                item = self.tabela_selecao_itens.item(row, column)
+                if item and item.text():
+                    
+                    i.append([item.text()])
+
+        lista = i[:6] + [i]
+        
+        #print(i)
+        print(lista[6]) 
 
     def show_messagebox(self, title, text):
         msg = QMessageBox()
@@ -434,18 +463,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.box_lucro.setValue(0.00)
         self.box_desconto.setValue(0.00)
         self.line_Valor_unit.clear()
-
+        
     def cancelar_produto(self):
-        #self.Produtos.QLineEdit.clear()
+        self.Produtos.QLineEdit.clear()
         self.box_codigo_produto.clear()
-        # self.line_produto.clear()
-        # self.line_descricao.clear()
-        # self.box_altura_produto.clear()
-        # self.box_largura_produto.clear()
-        # self.box_comprimento_produto.clear()
+        self.line_produto.clear()
+        self.line_descricao.clear()
+        self.box_altura_produto.clear()
+        self.box_largura_produto.clear()
+        self.box_comprimento_produto.clear()
 
     def atalho(self, p, f):
-        QShortcut("Return" , p).activated.connect(f)
+        QShortcut("Return" , p).activated.connect(f)    
+
+    def remove_selecao(self):
+        #self.tabela_selecao_itens.clear()
+        self.tabela_selecao_itens.clearContents()
+        self.tabela_selecao_itens.setRowCount(1)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
